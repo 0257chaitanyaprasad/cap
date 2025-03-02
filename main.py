@@ -24,3 +24,8 @@ def validate(email: EmailStr = Query(example="user@gmail.com")):
             "email": email,
             "message": "Invalid Email Address"
         }
+
+@app.head("/")
+async def head():
+    return {"status": "Server is Running 🔥"}
+
