@@ -4,3 +4,5 @@ opencv-python==4.8.0.74
 mediapipe==0.10.21
 numpy==1.26.2
 pillow==10.1.0
+pymongo==4.7.2
+
