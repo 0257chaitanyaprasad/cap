@@ -1,6 +1,5 @@
 flask==2.3.3
 email-validator
 dnspython
-smtplib
 werkzeug==2.3.3
 gunicorn
