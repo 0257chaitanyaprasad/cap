@@ -1,10 +1,11 @@
 services:
-  - name: email-verifier
+  - name: email-validation-api
     type: web
-    runtime: python
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --workers 4 --bind 0.0.0.0:$PORT
     envVars:
       - key: PORT
         value: 10000
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app --workers 4 --bind 0.0.0.0:$PORT
+    plan: free
     autoDeploy: true
