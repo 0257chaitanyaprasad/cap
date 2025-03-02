@@ -5,6 +5,8 @@ from typing import Union
 
 app = FastAPI(title="Email Validation API")
 
+port = 10000
+
 @app.get("/")
 def welcome():
     return {"message": "Email Validation API is Running 🔥"}
