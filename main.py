@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import smtplib
 import dns.resolver
 import re
+import os
 
 app = Flask(__name__)
 
@@ -53,4 +54,5 @@ def validate_email():
         return jsonify({"is_email_valid": False, "message": str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=10000)
+    port = int(os.getenv("PORT", 10000))
+    app.run(debug=True, host='0.0.0.0', port=port)
