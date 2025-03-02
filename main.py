@@ -18,29 +18,28 @@ def validate_email():
     
     try:
         # Check if Domain Exists
-        dns.resolver.resolve(domain, 'MX')
-    except dns.resolver.NoAnswer:
-        return jsonify({"is_email_valid": False, "message": "Invalid Domain"})
-    except dns.resolver.NXDOMAIN:
-        return jsonify({"is_email_valid": False, "message": "Domain Does Not Exist"})
+        records = dns.resolver.resolve(domain, 'MX')
+        mx_record = str(records[0].exchange)
+    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
+        return jsonify({"is_email_valid": False, "message": "Invalid Domain or Domain Does Not Exist"})
     except Exception as e:
         return jsonify({"is_email_valid": False, "message": str(e)})
 
     try:
-        # Connect to SMTP server to verify Email
-        server = smtplib.SMTP(timeout=10)
-        server.set_debuglevel(0)
-        server.connect(dns.resolver.resolve(domain, 'MX')[0].exchange.to_text())
+        # SMTP Connection
+        server = smtplib.SMTP(mx_record)
         server.helo()
-        server.mail("test@gmail.com")  # Dummy sender email
+        server.mail("test@gmail.com")
         code, _ = server.rcpt(email)
         server.quit()
+        
         if code == 250:
             return jsonify({"is_email_valid": True, "email": email, "message": "Email is Valid ✅"})
         else:
             return jsonify({"is_email_valid": False, "email": email, "message": "Email Does Not Exist ❌"})
+    
     except Exception as e:
         return jsonify({"is_email_valid": False, "message": str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=10000)
+    app.run(debug=True, host='0.0.0.0', port=10000)
