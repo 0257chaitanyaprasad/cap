@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import smtplib
 import dns.resolver
 import re
 import os
@@ -25,31 +24,13 @@ def validate_email():
     domain = email.split('@')[-1]
     
     try:
-        # Check if Domain Exists
+        # Check if Domain Exists with MX Records
         mx_records = dns.resolver.resolve(domain, 'MX')
         if not mx_records:
             return jsonify({"is_email_valid": False, "message": "No MX Records Found"})
+        return jsonify({"is_email_valid": True, "email": email, "message": "Email is Valid ✅ (MX Record Found)"})
     except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
         return jsonify({"is_email_valid": False, "message": "Invalid Domain or Domain Does Not Exist"})
-    except Exception as e:
-        return jsonify({"is_email_valid": False, "message": str(e)})
-
-    try:
-        # Connect to SMTP server to verify Email
-        mx_record = str(mx_records[0].exchange).strip()
-        server = smtplib.SMTP(mx_record, 25, timeout=10)
-        server.set_debuglevel(0)
-        server.helo()
-        server.mail("test@gmail.com")  # Dummy sender email
-        code, message = server.rcpt(email)
-        server.quit()
-        
-        if code == 250:
-            return jsonify({"is_email_valid": True, "email": email, "message": "Email is Valid ✅"})
-        else:
-            return jsonify({"is_email_valid": False, "email": email, "message": "Email Does Not Exist ❌"})
-    except smtplib.SMTPConnectError:
-        return jsonify({"is_email_valid": False, "message": "SMTP Connection Failed"})
     except Exception as e:
         return jsonify({"is_email_valid": False, "message": str(e)})
 
